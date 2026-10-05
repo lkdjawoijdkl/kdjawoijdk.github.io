@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你有101个优点</title>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#ffffff;
+  min-height:100vh;
+  overflow:hidden;
+  position:relative;
+  font-family: "Comic Sans MS", "Marker Felt", "华文圆体", "幼圆", system-ui, sans-serif;
+}
+
+/* 中间红色大标题 */
+.center-title{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  font-size:54px;
+  color:#b82642;
+  font-weight:bold;
+  white-space:nowrap;
+  z-index:30;
+  letter-spacing:2px;
+}
+
+/* 逐字显示的字 */
+.char{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.char.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* 每一条优点都是一个整体 */
+.item{
+  position:absolute;
+  font-weight:bold;
+  color:#222222;
+  opacity:0;
+  transform:translate(-50%, -50%) scale(0.5);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  white-space:nowrap;
+  z-index:1;
+}
+
+.item.show{
+  opacity:1;
+  transform:translate(-50%, -50%) scale(1);
+}
+</style>
+</head>
+<body>
+
+<div class="center-title" id="centerTitle"></div>
+
+<script>
+const list = [
+  "有趣",                // 1
+  "可爱",                // 2
+  "真诚",                // 3
+  "帅气",                // 4
+  "善良",                // 5
+  "聪明",                // 6
+  "勇敢",                // 7
+  "努力",                // 8
+  "机灵",                // 9
+  "伶俐",                // 10
+  "游戏厉害",            // 11
+  "有上进心",            // 12
+  "活泼",                // 13
+  "愿意倾听",            // 14
+  "愿意分享",            // 15
+  "积极",                // 16
+  "社交能力强",          // 17
+  "大方",                // 18
+  "爱护小动物",          // 19
+  "宽容",                // 20
+  "愿意反思",            // 21
+  "温柔",                // 22
+  "纯洁",                // 23
+  "尊重别人",            // 24
+  "谨慎",                // 25
+  "懂得拒绝",            // 26
+  "三观正",              // 27
+  "爱动脑筋",            // 28
+  "会穿搭",              // 29
+  "声音好听",            // 30
+  "爱笑",                // 31
+  "正直",                // 32
+  "有主见",              // 33
+  "言而有信",            // 34
+  "有礼貌",              // 35
+  "有担当",              // 36
+  "会照顾人",            // 37
+  "心思细腻",            // 38
+  "有边界感",            // 39
+  "为人慷慨",            // 40
+  "愿意尝试",            // 41
+  "认识你",              // 42
+  "负责",                // 43
+  "冷静",                // 44
+  "懂得珍惜",            // 45
+  "情绪稳定",            // 46
+  "会夸人",              // 47
+  "会给人带来快乐",      // 48
+  "好奇心强",            // 49
+  "有想象力",            // 50
+  "会说话",              // 51
+  "会给自己留后路",      // 52
+  "拍照技术好",          // 53
+  "浪漫",                // 54
+  "天真",                // 55
+  "宅",                  // 56
+  "体贴",                // 57
+  "有正能量的同时也有负能量", // 58
+  "热心肠",              // 59
+  "和你有共同话题",      // 60
+  "不虚假",              // 61
+  "说到做到",            // 62
+  "偶尔呆呆的",          // 63
+  "自信大方",            // 64
+  "会安慰人",            // 65
+  "专一",                // 66
+  "幽默",                // 67
+  "社牛",                // 68
+  "亲和力强",            // 69
+  "有使命感",            // 70
+  "有责任感",            // 71
+  "有魄力",              // 72
+  "有个性",              // 73
+  "有素质",              // 74
+  "有智慧",              // 75
+  "有特点",              // 76
+  "有气质",              // 77
+  "有独特眼光",          // 78
+  "与众不同",            // 79
+  "很沉稳",              // 80
+  "坦诚",                // 81
+  "性格好",              // 82
+  "爱自己",              // 83
+  "用心",                // 84
+  "贴心",                // 85
+  "细心",                // 86
+  "友善",                // 87
+  "独立",                // 88
+  "可靠",                // 89
+  "有品位",              // 90
+  "有领导力",            // 91
+  "才华横溢",            // 92
+  "观察力强",            // 93
+  "做事靠谱",            // 94
+  "有艺术细胞",          // 95
+  "逻辑清晰",            // 96
+  "气场强大",            // 97
+  "独一无二",            // 98
+  "说到做到",            // 99
+  "有魄力",              // 100
+  "有独特眼光"           // 101
+];
+
+let index = 0;
+let isRun = false;
+const placed = [];
+const titleText = "你有101个优点";
+
+// 生成逐字结构
+function renderTitleChars(){
+  const titleEl = document.getElementById("centerTitle");
+  titleEl.innerHTML = "";
+
+  for(let i = 0; i < titleText.length; i++){
+    const span = document.createElement("span");
+    span.className = "char";
+    span.innerText = titleText[i];
+    titleEl.appendChild(span);
+  }
+}
+
+// 逐字显示动画
+function showTitleChars(callback){
+  const chars = document.querySelectorAll("#centerTitle .char");
+  let i = 0;
+
+  function showOne(){
+    if(i < chars.length){
+      chars[i].classList.add("show");
+      i++;
+      setTimeout(showOne, 180);
+    }else{
+      if(callback) callback();
+    }
+  }
+
+  showOne();
+}
+
+// 红色标题本体
+function isInTitleCore(xPercent, yPercent){
+  const titleLeft = 43;
+  const titleRight = 57;
+  const titleTop = 46;
+  const titleBottom = 54;
+
+  return xPercent > titleLeft && xPercent < titleRight &&
+         yPercent > titleTop && yPercent < titleBottom;
+}
+
+// 红字周围安全区
+function isInSafetyZone(xPercent, yPercent){
+  const safeLeft = 34;
+  const safeRight = 66;
+  const safeTop = 37;
+  const safeBottom = 63;
+
+  return xPercent > safeLeft && xPercent < safeRight &&
+         yPercent > safeTop && yPercent < safeBottom;
+}
+
+// 屏幕边界保护
+function isOutOfBounds(rect){
+  const margin = 10;
+  return (
+    rect.left < margin ||
+    rect.top < margin ||
+    rect.right > window.innerWidth - margin ||
+    rect.bottom > window.innerHeight - margin
+  );
+}
+
+// 黑字之间防重叠
+function isOverlapping(rect1, rect2){
+  const gapX = 20;
+  const gapY = 18;
+
+  return !(
+    rect1.right + gapX < rect2.left ||
+    rect2.right + gapX < rect1.left ||
+    rect1.bottom + gapY < rect2.top ||
+    rect2.bottom + gapY < rect1.top
+  );
+}
+
+function checkCollision(itemData){
+  const test = document.createElement("div");
+  test.className = "item";
+  test.style.visibility = "hidden";
+  test.style.position = "absolute";
+  test.style.fontSize = itemData.fontSize + "px";
+  test.style.left = itemData.x + "%";
+  test.style.top = itemData.y + "%";
+  test.innerText = `${itemData.index}. ${itemData.text}`;
+  document.body.appendChild(test);
+
+  const rect1 = test.getBoundingClientRect();
+  let overlap = false;
+
+  for(const p of placed){
+    const rect2 = p.getBoundingClientRect();
+    if(isOverlapping(rect1, rect2)){
+      overlap = true;
+      break;
+    }
+  }
+
+  document.body.removeChild(test);
+  return {overlap, rect1};
+}
+
+// 生成候选位置：前半段随机，后半段优先外圈
+function generateCandidate(indexNum){
+  const isLateStage = indexNum >= 70; // 70条以后进入外圈优先模式
+
+  if(!isLateStage){
+    return {
+      x: 10 + Math.random() * 80,
+      y: 10 + Math.random() * 80
+    };
+  }
+
+  // 外圈优先：集中在画面边缘区域找空位
+  const edgeZones = [
+    {xMin: 10, xMax: 25, yMin: 10, yMax: 90}, // 左边缘
+    {xMin: 75, xMax: 90, yMin: 10, yMax: 90}, // 右边缘
+    {xMin: 25, xMax: 75, yMin: 10, yMax: 22}, // 上边缘
+    {xMin: 25, xMax: 75, yMin: 78, yMax: 90}  // 下边缘
+  ];
+
+  const zone = edgeZones[Math.floor(Math.random() * edgeZones.length)];
+
+  return {
+    x: zone.xMin + Math.random() * (zone.xMax - zone.xMin),
+    y: zone.yMin + Math.random() * (zone.yMax - zone.yMin)
+  };
+}
+
+// 优化后的空位查找
+function findEmptyPosition(indexNum, text, fontSize){
+  const maxAttempts = indexNum >= 85 ? 250 : 120; // 最后16条放宽尝试
+  let fallbackPos = null;
+
+  for(let i = 0; i < maxAttempts; i++){
+    const {x, y} = generateCandidate(indexNum);
+
+    if(isInTitleCore(x, y)) continue;
+    if(isInSafetyZone(x, y)) continue;
+
+    const {overlap, rect1} = checkCollision({
+      index: indexNum,
+      text: text,
+      x: x,
+      y: y,
+      fontSize: fontSize
+    });
+
+    if(overlap) continue;
+    if(isOutOfBounds(rect1)) continue;
+
+    return {x, y};
+  }
+
+  // 外圈也没找到，再做一次全局兜底搜索
+  for(let i = 0; i < 80; i++){
+    const x = 12 + Math.random() * 76;
+    const y = 12 + Math.random() * 76;
+
+    if(isInTitleCore(x, y)) continue;
+    if(isInSafetyZone(x, y)) continue;
+
+    const {overlap, rect1} = checkCollision({
+      index: indexNum,
+      text: text,
+      x: x,
+      y: y,
+      fontSize: fontSize
+    });
+
+    if(overlap) continue;
+    if(isOutOfBounds(rect1)) continue;
+
+    return {x, y};
+  }
+
+  return null;
+}
+
+function placeItem(indexNum, text){
+  let fontSize;
+  let pos = null;
+
+  // 前70条用较大字号
+  if(indexNum <= 70){
+    const sizes = [22, 24, 26, 28, 30];
+    for(const size of sizes){
+      fontSize = size;
+      pos = findEmptyPosition(indexNum, text, fontSize);
+      if(pos) break;
+    }
+  }
+
+  // 71-90条中等字号
+  if(!pos && indexNum <= 90){
+    const sizes = [20, 22, 24, 26];
+    for(const size of sizes){
+      fontSize = size;
+      pos = findEmptyPosition(indexNum, text, fontSize);
+      if(pos) break;
+    }
+  }
+
+  // 91-101条直接用小字号，优先保证能放下
+  if(!pos){
+    const sizes = [18, 17, 16];
+    for(const size of sizes){
+      fontSize = size;
+      pos = findEmptyPosition(indexNum, text, fontSize);
+      if(pos) break;
+    }
+  }
+
+  return {pos, fontSize};
+}
+
+function showNext(){
+  if(index >= list.length) return;
+
+  const indexNum = index + 1;
+  const text = list[index];
+  const {pos, fontSize} = placeItem(indexNum, text);
+
+  if(!pos){
+    // 找不到空位时只等待极短时间，不再反复卡死
+    setTimeout(showNext, 30);
+    return;
+  }
+
+  const div = document.createElement("div");
+  div.className = "item";
+  div.innerText = `${indexNum}. ${text}`;
+  div.style.fontSize = fontSize + "px";
+  div.style.left = pos.x + "%";
+  div.style.top = pos.y + "%";
+  document.body.appendChild(div);
+
+  placed.push(div);
+
+  setTimeout(()=>{
+    div.classList.add("show");
+  }, 40);
+
+  index++;
+
+  // 前70条正常速度，后面加速
+  if(indexNum <= 70){
+    setTimeout(showNext, 260);
+  }else if(indexNum <= 90){
+    setTimeout(showNext, 180);
+  }else{
+    setTimeout(showNext, 120);
+  }
+}
+
+function startBlackItems(){
+  if(isRun) return;
+  isRun = true;
+  showNext();
+}
+
+document.body.onclick = function(){
+  renderTitleChars();
+  showTitleChars(startBlackItems);
+};
+</script>
+
+</body>
+</html>
